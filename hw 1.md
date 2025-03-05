@@ -126,7 +126,7 @@ $$
 $$
 所以$M_1-M$idempotent。
 $$
-rank(M_1-M)=rank(P-P_1)=\text{tr}(P-P_1)\\=\text{tr}(P)-\text{tr}(P_1)=K-K_1=K_2
+rank(M_1-M)=rank(P-P_1)=\text{tr}(P-P_1) \\ =\text{tr}(P)-\text{tr}(P_1)=K-K_1=K_2
 $$
 
 #### (b)
