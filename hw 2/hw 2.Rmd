@@ -1,0 +1,292 @@
+---
+title: "Advanced Econometric hw 2 "
+author: "LEO LIN"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+# 1
+
+## preamble
+
+```{r,message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(readxl)
+setwd("F:\\碩一\\碩一下\\進階計量\\作業 2\\hw 2\\data")
+```
+
+## (a)
+
+```{r,message=FALSE}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+#construct the data frame with A(-3,3)B(0,3)C(-3,-2)D(0.5,0)
+df2 <- data.frame(x = c(-3, 0, -3, 0.5), y = c(3, 3, -2, 0))
+
+# produce the scatter plot with the regression line of y on x(including the #intercept) based on the 20 points and the 4 new points(in color red)
+a<-ggplot(df,aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+# add the 4 new points
+a + geom_point(data = df2, aes(x = x, y = y), color = "red") 
+```
+
+## (b)
+
+### (i)
+
+```{r}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+# add the point A to df
+n<-data.frame(x =-3 , y =3)
+
+df <- rbind(df,n ) #adjust the parameters of the point
+
+# compute the leverage value h_{ii} for point A
+X <- cbind(1, df$x)
+X_i <- X[21,]
+h_ii <- t(X_i) %*% solve(t(X) %*% X) %*% X_i
+
+# compute the leave one out residual foe point A
+y_hat <- X %*% solve(t(X) %*% X) %*% t(X) %*% df$y
+e_i_hat <- df$y[21] - y_hat[21]  
+e_i_telda <- e_i_hat / (1 - h_ii)
+print(h_ii)
+print(e_i_telda)
+```
+
+### (ii)
+The slope of $\tilde{\beta}$ is not necessarily larger the farther the point is, because it is influenced by both $h_{ii}$ and $\tilde{e}$.
+
+#### Point A
+
+```{r}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+# add the point A to df
+p<-data.frame(x =-3 , y =3)
+
+df <- rbind(df,p ) #adjust the parameters of the point
+
+b <-ggplot(df,aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+
+df3 <- p
+df4 <- df[-21,]
+
+b + geom_point(data = df3, aes(x = x, y = y), color = "red") +
+  geom_smooth(data = df, aes(x = x, y = y, color = "Full Data"), method = "lm", se = FALSE) +  
+  geom_smooth(data = df4, aes(x = x, y = y, color = "Leave-One-Out"), method = "lm", se = FALSE) +  
+  scale_color_manual(values = c("Full Data" = "blue", "Leave-One-Out" = "red"),  
+                     labels = c("Full Data" = "Full Data Regression ", 
+                                "Leave-One-Out" = "Leave-One-Out Regression ")) +  
+  labs(color = "Regression Line_A")
+```
+
+#### Point B
+```{r,echo=FALSE}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+p<-data.frame(x =0 , y =3)
+
+df <- rbind(df,p ) #adjust the parameters of the point
+
+b <-ggplot(df,aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+
+df3 <- p
+df4 <- df[-21,]
+
+b + geom_point(data = df3, aes(x = x, y = y), color = "red") +
+  geom_smooth(data = df, aes(x = x, y = y, color = "Full Data"), method = "lm", se = FALSE) +  
+  geom_smooth(data = df4, aes(x = x, y = y, color = "Leave-One-Out"), method = "lm", se = FALSE) +  
+  scale_color_manual(values = c("Full Data" = "blue", "Leave-One-Out" = "red"),  
+                     labels = c("Full Data" = "Full Data Regression ", 
+                                "Leave-One-Out" = "Leave-One-Out Regression ")) +  
+  labs(color = "Regression Line_B")
+
+```
+
+#### Point C
+```{r,echo=FALSE}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+p<-data.frame(x =-3 , y =-2)
+
+df <- rbind(df,p ) #adjust the parameters of the point
+
+b <-ggplot(df,aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+
+df3 <- p
+df4 <- df[-21,]
+
+b + geom_point(data = df3, aes(x = x, y = y), color = "red") +
+  geom_smooth(data = df, aes(x = x, y = y, color = "Full Data"), method = "lm", se = FALSE) +  
+  geom_smooth(data = df4, aes(x = x, y = y, color = "Leave-One-Out"), method = "lm", se = FALSE) +  
+  scale_color_manual(values = c("Full Data" = "blue", "Leave-One-Out" = "red"),  
+                     labels = c("Full Data" = "Full Data Regression ", 
+                                "Leave-One-Out" = "Leave-One-Out Regression ")) +  
+  labs(color = "Regression Line_C")
+```
+
+#### Point D
+```{r,echo=FALSE}
+#simulate a random sample of size 20 , x~N(0,1) and e~N(0,0.75^2)
+set.seed(0438)
+x <- rnorm(20, 0, 1)
+e <- rnorm(20, 0, 0.75)
+y <-1*x + e
+df <- data.frame(x, y)
+
+p<-data.frame(x =0.5 , y =0)
+
+df <- rbind(df,p ) #adjust the parameters of the point
+
+b <-ggplot(df,aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+
+df3 <- p
+df4 <- df[-21,]
+
+b + geom_point(data = df3, aes(x = x, y = y), color = "red") +
+  geom_smooth(data = df, aes(x = x, y = y, color = "Full Data"), method = "lm", se = FALSE) +  
+  geom_smooth(data = df4, aes(x = x, y = y, color = "Leave-One-Out"), method = "lm", se = FALSE) +  
+  scale_color_manual(values = c("Full Data" = "blue", "Leave-One-Out" = "red"),  
+                     labels = c("Full Data" = "Full Data Regression ", 
+                                "Leave-One-Out" = "Leave-One-Out Regression ")) +  
+  labs(color = "Regression Line_D")
+```
+
+# 2
+## (a)
+```{r}
+# data cleaning
+# import the data
+df <- read_xlsx(".\\data\\cps09ma_rename.xlsx")
+head(df)
+# clean the data
+df1<- df %>% filter(Race == 4,marital == 7,female == 0) %>%
+  select(education,age,earnings,hours,weeks) %>%
+  mutate(lwage = log(earnings/hours/weeks),exper = age - education - 6
+         ,exper2 = exper^2/100) %>%
+  select(lwage,education,exper,exper2)
+head(df1)
+```
+
+## (b)
+compute the influence
+$$
+\text{Influence} = \max_{1 \leq i \leq n} \left| \hat{Y_i} - \tilde{Y_i} \right|
+$$
+```{r}
+# lm model
+X <- model.matrix(lwage ~ education + exper + exper2, data = df1)
+
+# residual
+e_hat <- resid(lm(lwage ~ education + exper + exper2, data = df1))
+
+# projection matrix
+H <- X %*% solve(t(X) %*% X) %*% t(X)
+
+# diagonal elements of the hat matrix
+h_ii <- diag(H)
+
+# e_telda
+e_telda <- e_hat / (1 - h_ii)
+
+# absoulte value of y_hat - y_telda
+influence_candidate <- abs(h_ii * e_telda)
+
+print(which.max(influence_candidate))
+
+influence_candidate[35]
+
+```
+
+## (c)
+The estimated growth rate of wage with and without the 35th observation will be different significantly,
+there is a gap of 29.26396% between the two estimated growth rates.
+
+## (d)
+
+```{r}
+#recompute the estimated growth rate of wage withdraw the 35th observation
+df2 <- df1[-35,]
+X2 <- model.matrix(lwage ~ education + exper + exper2, data = df2)
+e_hat2 <- resid(lm(lwage ~ education + exper + exper2, data = df2))
+# projection matrix
+H2 <- X2 %*% solve(t(X2) %*% X2) %*% t(X2)
+
+# diagonal elements of the hat matrix
+h_ii2 <- diag(H2)
+# 0.253801542 %in% e_hat2
+# e_telda2
+e_telda2 <- e_hat2 / (1 - h_ii2)
+# absoulte value of y_hat - y_telda
+influence_candidate2 <- abs(h_ii2 * e_telda2)
+influence_candidate2[34]
+```
+
+After removing the 35th observation, the 34th observation becomes the most influential point,
+but compared to the 35th observation, the 34th observation has a smaller influence value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
